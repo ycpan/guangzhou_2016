@@ -1,0 +1,6 @@
+#!/bin/bash
+(./order.sh) & 
+(./route.sh) &
+(./diff.sh) &
+wait
+echo "Congratulation! The process is finshed,have a nice day!"
