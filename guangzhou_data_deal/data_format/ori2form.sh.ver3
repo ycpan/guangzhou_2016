@@ -1,0 +1,54 @@
+##############################################################################
+#日志输出格式为时间 OBU，ROUTE1，RSSI1，ROUTE2，RSSI2，ROUTE3，RSSI3，ROUTE4，RSSI4
+##############################################################################
+format()
+{
+Folder_A="orign"  
+for file_a in ${Folder_A}/*.log; do  
+    temp_file=`basename $file_a`  
+    iconv  -f  gbk   $file_a -o ${Folder_A}/source.tmp && cat ${Folder_A}/source.tmp >> source
+done               
+wait
+dos2unix -n source source.tmp
+rm -rf source
+sed '/^.*[信息进站=].*$/d' source.tmp >1.tmp && sed '/^$/d' 1.tmp > 2.tmp && sed 's/ rssi://' 2.tmp > 3.tmp
+sed -i 's/:OBU:/,OBU,/g' 3.tmp
+sed -i 's/rssi[1234]://g' 3.tmp
+#sed -i '/rssi2:/d' 3.tmp
+#sed -i 's/rssi3://g' 3.tmp
+#sed -i 's/rssi4://g' 3.tmp
+sed -i 's/qd://g' 3.tmp
+sed -i 's/;/,/g' 3.tmp  
+sed -i 's/000.....000000//g' 3.tmp
+sort -t , -k3n 3.tmp -o format_result.tmp 
+#ls output && echo "the dir output is exist,omit ..." || mkdir -v output
+#cp format_result format_result.csv && mv format_result.csv output 
+}
+
+order()
+{
+sort -t, -k1n format_result.tmp -o format_result.csv.tmp
+ls obu && rm -rf obu 
+#wait
+ls obu || mkdir -v obu
+cat format_result.csv.tmp | while read line
+do
+	obu="$(echo $line | awk -F "," '{print $3}')"
+	echo $line >> obu/$obu
+done
+#wait
+for name in obu/*
+do 
+	cat $name >> obu/format_result.csv
+done
+#wait
+
+ls output && echo "the dir output is exist,omit ..." || mkdir -v output
+cp obu/format_result.csv format_result && mv obu/format_result.csv output
+rm *.tmp
+rm -rf obu
+}
+
+format
+
+order
