@@ -1,0 +1,6 @@
+portnum =8013 端口号
+ipadd =219.136.133.180 ip地址
+device_id=99999999	汇聚地址
+heart_beat=10	汇聚心跳间隔
+DEBUG=1			串口类型
+floor_flag=4	楼层1-4为客运1-4层 9为安检点
